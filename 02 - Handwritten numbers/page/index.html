@@ -3,16 +3,33 @@
   <head>
     <title>Draw on Canvas</title>
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
       body {
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
         height: 100vh;
         margin: 0;
+        gap: 24px;
       }
 
       canvas {
         border: 1px solid black;
+        border-radius: 8px;
+      }
+
+      button {
+        font-size: 24px;
+        padding: 8px;
+      }
+
+      p {
+        font-size: 52px;
       }
     </style>
   </head>
@@ -25,7 +42,7 @@
       style="display: none"
     ></canvas>
     <button onclick="clean()">Clean</button>
-    <button onclick="predict()">Predecir</button>
+    <p id="prediction">0</p>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script>
       const canvas = document.getElementById("canvas");
@@ -57,15 +74,21 @@
       });
 
       canvas.addEventListener("mouseup", () => {
+        if (isDrawing) {
+          predict();
+        }
         isDrawing = false;
       });
 
       canvas.addEventListener("mouseout", () => {
+        if (isDrawing) {
+          predict();
+        }
         isDrawing = false;
       });
 
       async function load_model() {
-        model = await tf.loadLayersModel("../builds/model.json");
+        model = await tf.loadLayersModel("../builds/AD/model.json");
       }
 
       /**
@@ -189,7 +212,7 @@
         let results = model.predict(tensor4).dataSync();
         let maxIndex = results.indexOf(Math.max.apply(null, results));
 
-        alert("El número es: " + maxIndex);
+        document.getElementById("prediction").innerText = maxIndex;
       }
     </script>
   </body>
